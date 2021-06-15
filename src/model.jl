@@ -323,9 +323,9 @@ function NLPModels.jac_structure!(model :: RADNLPModel, rows :: AbstractVector{<
   @variables xs[1:model.meta.nvar]
   _fun = model.c(xs)
   Jx   = Symbolics.jacobian_sparsity(_fun, xs)
-  #Tangi: We should do better here!
-  rows .= findnz(Jx)[1]
-  cols .= findnz(Jx)[2]
+  I, J, _ = findnz(Jx)
+  rows .= I
+  cols .= J
   return rows, cols
 end
 
@@ -355,6 +355,8 @@ function NLPModels.jprod!(model :: RADNLPModel, x :: AbstractVector, v :: Abstra
   increment!(model, :neval_jprod)
   #Option 1: ForwardDiff
   Jv .= ForwardDiff.derivative(t -> model.c(x + t * v), 0)
+  #Option 2: SparseDiffTools
+  #Jv .= auto_jacvec(f, x, v)
   return Jv
 end
 
@@ -378,8 +380,9 @@ function NLPModels.hess_structure!(model :: RADNLPModel, rows :: AbstractVector{
     _fun = model.f(xs)
   end
   H = tril(Symbolics.hessian_sparsity(_fun, xs))
-  rows .= findnz(H)[1]
-  cols .= findnz(H)[2]
+  I, J, _ = findnz(H)
+  rows .= I
+  cols .= J
   return rows, cols
 end
 
