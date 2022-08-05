@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+<<<<<<<< HEAD:test/nlp/problems/genrose.jl
+=======
+>>>>>>> f36d5df (sparse-dev)
 export genrose_autodiff
 
 # Generalized Rosenbrock function.
@@ -39,6 +43,7 @@ export genrose_autodiff
 # D. Orban, Montreal, 08/2015.
 
 "Generalized Rosenbrock model in size `n`"
+<<<<<<< HEAD
 function genrose_autodiff(n::Int = 500; kwargs...)
   n < 2 && error("genrose: number of variables must be ≥ 2")
 
@@ -49,7 +54,42 @@ function genrose_autodiff(n::Int = 500; kwargs...)
       s += 100 * (x[i + 1] - x[i]^2)^2 + (x[i] - 1)^2
     end
     return s
+========
+function genrose_radnlp(; n::Int=100, type::Val{T}=Val(Float64), kwargs...) where T
+  function f(x)
+    n = length(x)
+    return 1 + 100 * sum((x[i+1] - x[i]^2)^2 for i=1:n-1) + sum((x[i] - 1)^2 for  i=1:n-1)
+>>>>>>>> f36d5df (sparse-dev):test/problems/genrose.jl
+  end
+  x0 = T.([i / (n+1) for i = 1 : n])
+  return RADNLPModel(f, x0, name="genrose_radnlp"; kwargs...)
+end
+
+<<<<<<<< HEAD:test/nlp/problems/genrose.jl
+  return ADNLPModel(f, x0, name = "genrose_autodiff"; kwargs...)
+========
+function genrose_autodiff(; n::Int=100, type::Val{T}=Val(Float64)) where T
+  function f(x)
+    n = length(x)
+    return 1 + 100 * sum((x[i+1] - x[i]^2)^2 for i=1:n-1) + sum((x[i] - 1)^2 for  i=1:n-1)
+  end
+  x0 = T.([i / (n+1) for i = 1 : n])
+  return ADNLPModel(f, x0, name="genrose_autodiff")
+>>>>>>>> f36d5df (sparse-dev):test/problems/genrose.jl
+=======
+function genrose_autodiff(n :: Int=500)
+
+  n < 2 && error("genrose: number of variables must be ≥ 2")
+
+  x0 = [i/(n+1) for i = 1:n]
+  f(x::AbstractVector) = begin
+    s = 1.0
+    for i = 1:n-1
+      s += 100 * (x[i+1]-x[i]^2)^2 + (x[i]-1)^2
+    end
+    return s
   end
 
-  return ADNLPModel(f, x0, name = "genrose_autodiff"; kwargs...)
+  return ADNLPModel(f, x0, name="genrose_autodiff")
+>>>>>>> f36d5df (sparse-dev)
 end

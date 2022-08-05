@@ -8,6 +8,7 @@ function (regr::LinearRegression)(beta)
   return dot(r, r) / 2
 end
 
+<<<<<<< HEAD
 ReverseDiffAD() = ADNLPModels.ADModelBackend(
   ADNLPModels.ReverseDiffADGradient(nothing),
   ADNLPModels.ReverseDiffADHvprod(),
@@ -141,3 +142,27 @@ test_autodiff_model(
   jacobian_backend = ADNLPModels.ZygoteADJacobian,
   hessian_backend = ADNLPModels.ZygoteADHessian,
 )
+
+  @testset "Constructors for ADNLPModel" begin
+    lvar, uvar, lcon, ucon, y0 = -ones(2), ones(2), -ones(1), ones(1), zeros(1)
+    badlvar, baduvar, badlcon, baducon, bady0 = -ones(3), ones(3), -ones(2), ones(2), zeros(2)
+    nlp = ADNLPModel(f, x0)
+    nlp = ADNLPModel(f, x0, lvar, uvar)
+    nlp = ADNLPModel(f, x0, c, lcon, ucon)
+    nlp = ADNLPModel(f, x0, c, lcon, ucon, y0=y0)
+    nlp = ADNLPModel(f, x0, lvar, uvar, c, lcon, ucon)
+    nlp = ADNLPModel(f, x0, lvar, uvar, c, lcon, ucon, y0=y0)
+    @test_throws DimensionError ADNLPModel(f, x0, badlvar, uvar)
+    @test_throws DimensionError ADNLPModel(f, x0, lvar, baduvar)
+    @test_throws DimensionError ADNLPModel(f, x0, c, badlcon, ucon)
+    @test_throws DimensionError ADNLPModel(f, x0, c, lcon, baducon)
+    @test_throws DimensionError ADNLPModel(f, x0, c, lcon, ucon, y0=bady0)
+    @test_throws DimensionError ADNLPModel(f, x0, badlvar, uvar, c, lcon, ucon)
+    @test_throws DimensionError ADNLPModel(f, x0, lvar, baduvar, c, lcon, ucon)
+    @test_throws DimensionError ADNLPModel(f, x0, lvar, uvar, c, badlcon, ucon)
+    @test_throws DimensionError ADNLPModel(f, x0, lvar, uvar, c, lcon, baducon)
+    @test_throws DimensionError ADNLPModel(f, x0, lvar, uvar, c, lcon, ucon, y0=bady0)
+  end
+end
+
+test_autodiff_model()
