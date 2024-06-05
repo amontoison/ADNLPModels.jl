@@ -26,6 +26,7 @@ end
 
 @testset "Basic Hessian derivative test" begin
   include("sparse_hessian.jl")
+  include("sparse_hessian_nls.jl")
 end
 
 for problem in NLPModelsTest.nlp_problems ∪ ["GENROSE"]
